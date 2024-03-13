@@ -72,5 +72,5 @@ func HeaderError(typ string, err, errParse error, b []byte) error {
 }
 
 func headerErrorMsg(typ string, err error, b []byte) error {
-	return errs.NewPublic(fmt.Sprintf("error when reading %s headers: %s. Buffer size=%d, contents: %s", typ, err, len(b), BufferSnippet(b)))
+	return errs.NewPublic(fmt.Sprintf("error when reading %s headers: %s. Buffer size=%d, contents: %s", typ, err, len(b), string(b)))
 }
