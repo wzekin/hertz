@@ -30,6 +30,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server/render"
 	errs "github.com/cloudwego/hertz/pkg/common/errors"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/common/tracer/stats"
 	"github.com/cloudwego/hertz/pkg/common/tracer/traceinfo"
 	"github.com/cloudwego/hertz/pkg/network"
@@ -290,6 +291,19 @@ func (s Server) Serve(c context.Context, conn network.Conn) (err error) {
 				internalStats.Record(ti, stats.ServerHandleFinish, err)
 			})
 		}
+
+		logID := ctx.Request.Header.Get("X-TT-LOGID")
+		if logID == "" {
+			logID = ctx.Request.Header.Get("X-Tt-Logid")
+			if logID == "" {
+				logID = "-"
+			}
+		}
+
+		logCtx := context.WithValue(cc, "K_LOGID", logID)
+
+		path := ctx.Request.URI().PathOriginal()
+		hlog.CtxWarnf(logCtx, "receiving http: method: %s path: %s", string(ctx.Request.Method()), string(path))
 		// Handle the request
 		//
 		// NOTE: All middlewares and business handler will be executed in this. And at this point, the request has been parsed
